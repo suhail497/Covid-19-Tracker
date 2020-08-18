@@ -4,6 +4,9 @@ import { ThemeProvider, Typography, FormControl, Select, MenuItem, CardContent, 
 import theme from "./Theme"
 import { useStyles } from './appstyles';
 import InfoBox from './components/Infobox/InfoBox';
+import Table from './components/Table/Table';
+import { sortData } from './utlils';
+
 
 
 // https://disease.sh/v3/covid-19/countries
@@ -14,6 +17,8 @@ const App = () => {
   const [countries, setCountries] = useState([])
   const [country, setCountry] = useState('worldwide') //this for drop down using menu and select options
   const [countryInfo, setCountryInfo] = useState({})
+  const [tableData, setTableData] = useState([])
+
 
   // for worldwide case
   useEffect(() => {
@@ -39,7 +44,13 @@ const App = () => {
               value: country.countryInfo.iso2
             }
           ))
+
+          // for sorting 
+          const sorting = sortData(data)
           setCountries(countries);
+          // setTableData(data)
+          setTableData(sorting)
+
         });
 
     };
@@ -59,6 +70,8 @@ const App = () => {
     await fetch(url)
       .then(response => response.json())
       .then(data => {
+        const sorting = sortData(data)
+
         setCountry(countryCode);
         setCountryInfo(data);
       })
@@ -94,6 +107,7 @@ const App = () => {
             <Typography variant="h6" >
               Live cases by Country
                       </Typography>
+            <Table countries={tableData} />
             <Typography variant="h6" >
               World Wide New cases
                 </Typography>

@@ -2,6 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { Line } from "react-chartjs-2";
 import numeral from "numeral"
 
+
+
+const colorCases = {
+    cases: {
+        hex: "#CC1034",
+        rgb: "rgb(204, 16, 52)",
+        half_op: "rgba(204, 16, 52, 0.5)",
+        multiplier: 800,
+    },
+    recovered: {
+        hex: "#7dd71d",
+        rgb: "rgb(125, 215, 29)",
+        half_op: "rgba(125, 215, 29, 0.5)",
+        multiplier: 1200,
+    },
+    deaths: {
+        hex: "#fb4443",
+        rgb: "rgb(251, 68, 67)",
+        half_op: "rgba(251, 68, 67, 0.5)",
+        multiplier: 2000,
+    },
+};
+
+
+
+
 const options = {
     legend: {
         display: false,
@@ -47,7 +73,7 @@ const options = {
     },
 };
 
-const buildChartData = (data, casesType) => {
+const buildChartData = (data, casesType = 'cases') => {
     let chartData = [];
     let lastDataPoint;
     for (let date in data.cases) {
@@ -63,7 +89,7 @@ const buildChartData = (data, casesType) => {
     return chartData;
 };
 
-const LineChart = ({ casesType }) => {
+const LineChart = ({ casesType = 'cases' }) => {
     const [data, setData] = useState({});
 
     useEffect(() => {
@@ -73,7 +99,8 @@ const LineChart = ({ casesType }) => {
                     return response.json();
                 })
                 .then((data) => {
-                    let chartData = buildChartData(data, 'cases');
+                    console.log("graph", data)
+                    let chartData = buildChartData(data, casesType);
                     setData(chartData);
                     console.log(chartData);
                     // buildChart(chartData);
@@ -90,11 +117,13 @@ const LineChart = ({ casesType }) => {
                 <Line
                     options={options}
                     data={{
+
                         datasets: [
                             {
-                                backgroundColor: "rgba(204, 16, 52, 0.5)",
-                                borderColor: "#CC1034",
-                                data: data,
+                                backgroundColor: colorCases[casesType].hex,
+                                // : "rgba(125, 215, 29, 0.5)",
+                                // borderColor: "#42f5c5",
+                                data: data
                             },
                         ],
                     }}

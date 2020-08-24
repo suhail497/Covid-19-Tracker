@@ -5,7 +5,7 @@ import theme from "./Theme"
 import { useStyles } from './appstyles';
 import InfoBox from './components/Infobox/InfoBox';
 import Table from './components/Table/Table';
-import { sortData } from './utlils';
+import { sortData, prettyPrintStat } from './utlils';
 import LineChart from './components/LineChart/LineChart';
 import Map from './components/Map/Map';
 // import "leaflet\dist\leaflet.css"
@@ -21,9 +21,13 @@ const App = () => {
   const [country, setCountry] = useState('worldwide') //this for drop down using menu and select options
   const [countryInfo, setCountryInfo] = useState({})
   const [tableData, setTableData] = useState([])
+  // for map use in leaflet
   const [mapCenter, setMapCenter] = useState({ lat: 34.80746, lng: -40.4796 })
   const [mapZoom, setMapZoom] = useState(3)
-
+  // to show the data in the map
+  const [mapCountries, setMapCountries] = useState([])
+  // for change the color 
+  const [casesType, setCasesType] = useState('cases')
 
   // for worldwide case
   useEffect(() => {
@@ -55,6 +59,8 @@ const App = () => {
           setCountries(countries);
           // setTableData(data)
           setTableData(sorting)
+          // for showing the circles in the map
+          setMapCountries(data)
 
         });
 
@@ -104,11 +110,25 @@ const App = () => {
             </FormControl>
           </div>
           <div className={classes.appstats}>
-            <InfoBox title='Total no of cases' cases={countryInfo.todayCases} total={countryInfo.cases} />
-            <InfoBox title='Recovered' cases={countryInfo.todayRecovered} total={countryInfo.recovered} />
-            <InfoBox title='Deaths' cases={countryInfo.todayDeaths} total={countryInfo.deaths} />
+            <InfoBox
+              isRed
+              onClick={e => setCasesType('cases')}
+              active={casesType === 'cases'}
+
+              title='Today Covid Cases' cases={prettyPrintStat(countryInfo.todayCases).toLocaleUpperCase()} total={prettyPrintStat(countryInfo.cases).toLocaleUpperCase()} />
+            <InfoBox
+              onClick={e => setCasesType('recovered')}
+              active={casesType === 'recovered'}
+              title='Today Recovered' cases={prettyPrintStat(countryInfo.todayRecovered).toLocaleUpperCase()} total={prettyPrintStat(countryInfo.recovered).toLocaleUpperCase()} />
+            <InfoBox
+              onClick={e => setCasesType('deaths')}
+              active={casesType === 'deaths'}
+              isRed
+              title='Today Deaths' cases={prettyPrintStat(countryInfo.todayDeaths).toLocaleUpperCase()} total={prettyPrintStat(countryInfo.deaths).toLocaleUpperCase()} />
           </div>
           <Map
+            casesType={casesType}
+            countries={mapCountries}
             center={mapCenter}
             zoom={mapZoom}
           />
@@ -124,9 +144,11 @@ const App = () => {
             <Table countries={tableData} />
             <Typography variant="h6" >
 
-              World Wide New cases
+              World Wide {casesType} New cases
                 </Typography>
-            <LineChart />
+            <LineChart casesType={casesType}
+              active={casesType === 'recovered'}
+            />
           </CardContent>
         </Card>
 

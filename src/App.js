@@ -6,7 +6,10 @@ import { useStyles } from './appstyles';
 import InfoBox from './components/Infobox/InfoBox';
 import Table from './components/Table/Table';
 import { sortData } from './utlils';
-
+import LineChart from './components/LineChart/LineChart';
+import Map from './components/Map/Map';
+// import "leaflet\dist\leaflet.css"
+import "leaflet/dist/leaflet.css"
 
 
 // https://disease.sh/v3/covid-19/countries
@@ -18,6 +21,8 @@ const App = () => {
   const [country, setCountry] = useState('worldwide') //this for drop down using menu and select options
   const [countryInfo, setCountryInfo] = useState({})
   const [tableData, setTableData] = useState([])
+  const [mapCenter, setMapCenter] = useState({ lat: 34.80746, lng: -40.4796 })
+  const [mapZoom, setMapZoom] = useState(3)
 
 
   // for worldwide case
@@ -70,11 +75,14 @@ const App = () => {
     await fetch(url)
       .then(response => response.json())
       .then(data => {
-        const sorting = sortData(data)
-
+        // const sorting = sortData(data)
         setCountry(countryCode);
         setCountryInfo(data);
-      })
+        // for map
+        setMapCenter([data.countryInfo.lat, data.countryInfo.long]);
+        setMapZoom(4);
+
+      });
   }
   console.log('country', countryInfo)
 
@@ -100,7 +108,13 @@ const App = () => {
             <InfoBox title='Recovered' cases={countryInfo.todayRecovered} total={countryInfo.recovered} />
             <InfoBox title='Deaths' cases={countryInfo.todayDeaths} total={countryInfo.deaths} />
           </div>
+          <Map
+            center={mapCenter}
+            zoom={mapZoom}
+          />
         </div>
+
+
         <Card className={classes.apppright}>
 
           <CardContent>
@@ -109,11 +123,13 @@ const App = () => {
                       </Typography>
             <Table countries={tableData} />
             <Typography variant="h6" >
+
               World Wide New cases
                 </Typography>
-
+            <LineChart />
           </CardContent>
         </Card>
+
       </ThemeProvider>
     </div>
   );
